@@ -1,4 +1,4 @@
-package Average;
+package ALGGEN::ScalarTask::Average;
 
 sub new {
     my $class = shift;
@@ -12,7 +12,7 @@ sub get_code {
 );
 }
 
-package DifferentNumbers;
+package ALGGEN::ScalarTask::DifferentNumbers;
 
 sub new {
     my $class = shift;
