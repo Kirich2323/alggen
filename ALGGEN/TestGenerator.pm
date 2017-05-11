@@ -332,8 +332,6 @@ my %test_types = (
     ff => [ \&get_invalid_positions, \&get_invalid_value ]
 );
 
-my %argv = @ARGV;
-
 sub generate {
     my ($arr) = @_;
     my $type = $argv{'--type'};
@@ -359,6 +357,7 @@ sub gen {
     my $param_values = '( ' . join(', ', map { "\$params{$_}" } sort(keys %{$self->{vars}}) ) . ' )';
     my $updates_text = join(";\n", @{$self->gen_updates()});
     my $text = qq(
+my \%argv = \@ARGV;
 $constraints
 $set_params_txt
 set_params();
