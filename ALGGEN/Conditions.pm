@@ -38,7 +38,6 @@ sub get_pos_sign {
 sub generate {
     my ($self, $n) = @_;
     defined $n or $n = int(rand($ALGGEN::Constants::MAX_CONDITIONS)) + 1;
-    $n = 1;
     $self->{conditions} = [
         sub { [ $self->get_val_sign, value, $self->get_var ] },
         sub { [ '==', [ '%', [ '+', value, '1' ], $self->get_var ], '0' ] },
