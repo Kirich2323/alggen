@@ -15,6 +15,9 @@ sub new {
 sub gen_constaints {
     my ($self) = @_;
     my $txt = q(my %params;
+if (exists($argv{'--n'})) {
+    $params{n} = $argv{'--n'};
+}
 my %constraints = );
     $txt .= '( ' . join(', ', map { " $_->{name} => [ $_->{constraints}->[0], $_->{constraints}->[1] ]" } values %{$self->{vars}}) . ' );';
 }
@@ -67,7 +70,7 @@ my $set_params_txt = q(sub set_params {
     my ($p) = @_;
     foreach(keys %constraints) {
         if(defined $p and exists($p->{$_})) {
-            $params{$_} = $p{$_};
+            $params{$_} = $p->{$_};
         }
         else {
             my $left = $constraints{$_}->[0];
@@ -360,7 +363,7 @@ sub gen {
 my \%argv = \@ARGV;
 $constraints
 $set_params_txt
-set_params();
+set_params(\\\%params);
 my \$MAX_VAL = $ALGGEN::Constants::MAX_VAL;
 my \$MIN_VAL = $ALGGEN::Constants::MIN_VAL;
 my \$MIN_N = $ALGGEN::Constants::MIN_N;
