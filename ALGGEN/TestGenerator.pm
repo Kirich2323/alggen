@@ -16,39 +16,7 @@ sub gen_constaints {
     my ($self) = @_;
     my $txt = q(my %params;
 my %constraints = );
-    $txt .= '( ' . join(', ', map { " $_ => [ $self->{vars}->{$_}->{constraints}->[0], $self->{vars}->{$_}->{constraints}->[1] ]" } keys %{$self->{vars}} ) . ' );';
-}
-
-my $set_params_txt = q(sub set_params {
-    my ($p) = @_;
-    foreach(keys %constraints) {
-        if(defined $p and exists($p->{$_})) {
-            $params{$_} = $p{$_};
-        }
-        else {
-            my $left = $constraints{$_}->[0];
-            my $right = $constraints{$_}->[1];
-            $params{$_} = int(rand($right - $left)) + $left;
-        }
-    }
-    $valid_values = [ [ $MIN_VAL, $::MAX_VAL ] ];
-    $valid_positions = [ [ $MIN_N, $MAX_N ] ];
-}
-);
-
-sub set_params {
-    my ($self, $params) = @_;
-    foreach(keys %{$self->{vars}}) {
-        if(defined $params and exists($params->{$_})) {
-            $self->{params}->{$_} = $params->{$_};
-        }
-        else {
-            my $left = $self->{vars}->{$_}->{constraints}->[0];
-            my $right = $self->{vars}->{$_}->{constraints}->[1];
-            print $_ . " param \n";
-            $self->{params}->{$_} = int(rand($right - $left)) + $left;
-        }
-    }
+    $txt .= '( ' . join(', ', map { " $_->{name} => [ $_->{constraints}->[0], $_->{constraints}->[1] ]" } values %{$self->{vars}}) . ' );';
 }
 
 sub update_positions {
