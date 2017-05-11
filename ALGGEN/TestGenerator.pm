@@ -19,17 +19,6 @@ my %constraints = );
     $txt .= '( ' . join(', ', map { " $_->{name} => [ $_->{constraints}->[0], $_->{constraints}->[1] ]" } values %{$self->{vars}}) . ' );';
 }
 
-sub update_positions {
-    my ($self, $val) = @_;
-    $return_pos = sub { $_[0] * $val + $val - 1 };
-    foreach(@{$self->{valid_positions}}) {
-        my $new_left = int(($_->[0] + $val - 1) / $val);
-        if($new_left * $val + $val - 1 <= $_->[1]) {
-            $_ = [ $new_left, int(($_->[1] + $val - 1) / $val) ];
-        }
-    }
-}
-
 sub generate {
     my ($self) = @_;
     $self->set_params();
