@@ -2,18 +2,18 @@ package ALGGEN::TaskGenerator;
 
 use Archive::Zip;
 use ALGGEN::Constants;
-use ALGGEN::ScalarTask;
+use ALGGEN::OutputTask;
 use ALGGEN::Prog qw(make_expr);
 use ALGGEN::TestGenerator;
 use ALGGEN::Conditions;
 use ALGGEN::Var;
 
+my @output_tasks = (ALGGEN::OutputTask::Average->new(), ALGGEN::OutputTask::DifferentNumbers->new(), ALGGEN::OutputTask::Print->new());
+
 sub new {
     my $class = shift;
-    my @scalar_tasks = (ALGGEN::ScalarTask::Average->new(), ALGGEN::ScalarTask::DifferentNumbers->new(), undef);
     my $self = {
-        test_number => $Constants::MIN_TEST_NUMBER,
-        scalar_task => undef,
+        output_task => @output_tasks[rand @output_tasks],
         zip => Archive::Zip->new(),
         text => [],
         vars => { n => ALGGEN::Var->new( 'n', [ $ALGGEN::Constants::MIN_N, $ALGGEN::Constants::MAX_N ], $ALGGEN::Constants::DEF_TYPE) },
@@ -121,13 +121,12 @@ sub save_sol {
     my $self = shift;
     my $vars = join(', ', map {"\$$_"} sort(keys %{$self->{vars}}));
     my $conditions = $self->{conditions}->to_lang();
-    my $scalar_code =  "";
-    my $output_code = qq(print \$fo "\$size \\n";
-print \$fo join(' ', \@ans););
-    if (defined $self->{scalar_task}) {
-        $scalar_code = $self->{scalar_task}->get_code();
-        $output_code = qq(print \$fo \$scalar_ans;);
-    }
+    #my $scalar_code =  "";
+    my $output_code = $self->{output_task}->get_code();
+    #if (defined $self->{output_task}) {
+    #    $scalar_code = $self->{output_task}->get_code();
+    #    $output_code = qq(print \$fo \$scalar_ans;);
+    #}
     my $sol = qq(
 open(my \$fi, "<", "input.txt");
 open(my \$fo, ">", "output.txt");
@@ -146,7 +145,6 @@ if (\$size == 0) {
     print \$fo -1;
 }
 else {
-    $scalar_code
     $output_code
 }
 close \$fi;
@@ -177,7 +175,8 @@ sub save_xml {
   \$" . num_to_exp($self->{vars}->{$_}->{constraints}->[0]) . " \\le $_ \\le " .  num_to_exp($self->{vars}->{$_}->{constraints}->[1]) . "\$
 </p>"} sort(keys %{$self->{vars}});
     my $constrainst_blocks_str = join("\n", @constrainst_blocks);
-
+    my $output_txt = $self->{output_task}->output_text;
+    my $output_format = $self->{output_task}->output_format;
     my $xml_text = qq(<?xml version="1.0" encoding="UTF-8"?>
 <CATS version="1.9">
 <Problem title="Generated" lang="ru"
@@ -185,7 +184,7 @@ sub save_xml {
         inputFile="input.txt" outputFile="output.txt">
 <ProblemStatement>
 <p>
-Дан массив \$a\$, состоящий из \$n\$ целых чисел. Требуется написать программу, которая выводит эелементы:
+Дан массив \$a\$, состоящий из \$n\$ целых чисел. Требуется написать программу, которая $output_txt:
     <ul>
         $task_text
     </ul>
@@ -201,7 +200,7 @@ sub save_xml {
 
 <OutputFormat>
 <p>
-  Первое число - количество элементов в ответе. Далее следуют числа через пробел.
+  $output_format
 </p>
 </OutputFormat>
 
